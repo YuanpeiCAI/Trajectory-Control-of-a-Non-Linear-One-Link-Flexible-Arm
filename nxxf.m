@@ -1,6 +1,6 @@
 % nxxf is a transcendental equation
 
-function eq=nxxf(beta)
+function eq=nxxf(a)
 %beam lenth (ft)
 l=4;
 %beam mass (lbfs^2/ft)
@@ -21,7 +21,7 @@ EI=28.6;
 rho=5.25;
 M=ML/(rho*A*l);
 J=Jp/(rho*A*l^3);
-eq=(1+cos(beta).*cosh(beta))-M.*beta.*(sin(beta).*cosh(beta)-cos(beta).*sinh(beta))-J.*beta.^3.*(sin(beta).*cosh(beta)+cos(beta).*sinh(beta))+M.*J.*beta.^4.*(1-cos(beta).*cosh(beta));
+eq=(1+cos(a).*cosh(a))-M.*a.*(sin(a).*cosh(a)-cos(a).*sinh(a))-J.*a.^3.*(sin(a).*cosh(a)+cos(a).*sinh(a))+M.*J.*a.^4.*(1-cos(a).*cosh(a));
 end
 
 

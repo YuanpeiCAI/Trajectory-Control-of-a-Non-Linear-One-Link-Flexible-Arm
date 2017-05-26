@@ -55,9 +55,9 @@ open=1;
 % ddyd is the desired acceleration of actuator
 while(n*t<=Te)
     if(i(n)<=T)
-        yd(n)=(90/T)*(i(n)-T/360*sind(360*i(n)/T));
+        yd(n)=(90/T)*(i(n)-1/pi*sind(360*i(n)/T));
         dyd(n)=(90/T)*(1-cosd(360*i(n)/T));
-        ddyd(n)=(90/T)*(360/T)*sind(360*i(n)/T);
+        ddyd(n)=(90/T)*pi*sind(360*i(n)/T);
     else
         yd(n)=yd(n-1);
         dyd(n)=0;
@@ -65,6 +65,7 @@ while(n*t<=Te)
     end
     n=n+1;
 end
+plot(i,dyd)
 
 
 
@@ -74,23 +75,21 @@ end
 % omega(2) and omega(3) represents the frequency
 M=ML/(rho*A*l);
 J=Jp/(rho*A*l^3);
-
-% beta=fsolve((1+cos(beta)*cosh(beta))-M*beta*(sin(beta)*cosh(beta)
-% -cos(beta)*sinh(beta))-J*beta^3*(sin(beta)*cosh(beta)+cos(beta)*sinh(beta))
-% +M*J*beta^4*(1-cos(beta)*cosh(beta)),8)
-% f1=2.12;
-% beta=sqrt(sqrt(rho*A*(2*pi*f1)^2*l^4/EI))
+% beta=fsolve(@nxxf,3)
+% f=sqrt(beta^4*EI/(rho*A*l^4))/(2*pi)
 beta(2)=1.6099;
-beta(3)=3.211;
+beta(3)=3.2114;
 j=2;
 % xi=t:t:1;
 while(j<=3)
-    n=1;
+%     n=1;
 %     natural frequency
     omega(j)=sqrt(beta(j)^4*EI/(rho*A*l^4));
 %     appied boundary condition and get the coefficient of the mode
     C2(j)=(cos(beta(j))+cosh(beta(j))-M*beta(j)*(sin(beta(j))-sinh(beta(j))))...
         /(sin(beta(j))-sinh(beta(j))+M*beta(j)*(cos(beta(j))-cosh(beta(j))));
+%     C2(j)=(J*beta(j)^3*(cos(beta(j))-cosh(beta(j)))+sin(beta(j))+sinh(beta(j)))...
+%         /(J*beta(j)^3*(sin(beta(j))+sinh(beta(j)))-(cos(beta(j))+cosh(beta(j))))
 %     while(n<=1000)
 %         phi(j,n)=sin(beta(j)*xi(n))-sinh(beta(j)*xi(n))+C2(j)*(cos(beta(j)*xi(n))-cosh(beta(j)*xi(n)));
 %         n=n+1;
@@ -117,7 +116,6 @@ end
 % x(4) is the derivitive of theta 
 % x(5) and x(6) are derivitive of delta(1) and delta(2) in terms of time
 syms xi;
-dphi1(xi)=diff(phi1(xi),xi,1);
 dphi2(xi)=diff(phi2(xi),xi,1);
 dphi3(xi)=diff(phi3(xi),xi,1);
 ddphi2(xi)=diff(dphi2(xi),xi,1);
@@ -137,7 +135,7 @@ M(3,3)=rho*A*l*quadl(@chi33,0,1)+ML*phi3(1)^2+Jp*dphi3(1)^2;
 % syms a;
 % K(1,1)=int(ddphi2(xi)^2,0,1);
 K(1,1)=quadl(@zeta2,0,1);
-% K(2,1)=int(ddphi3(xi)^2,0,1);
+% K(2,2)=int(ddphi3(xi)^2,0,1);
 K(2,2)=quadl(@zeta3,0,1);
 K(1,2)=0;
 K(2,1)=0;
@@ -156,8 +154,6 @@ xd(3,1)=0;
 xd(4,1)=0;
 n=1;
 while(n*t<=Te)
-    % inertia matrix
-    M(1,1)=J0+Jp+ML*l^2+I0+ML*(phi2(1)*xd(1,n)+phi3(1)*xd(2,n))^2;
     % nonlinear term
     n2(1,1)=-ML*dyd(n)^2*(phi2(1)*phi2(1)*xd(1,n)+phi2(1)*phi3(1)*xd(2,n));
     n2(2,1)=-ML*dyd(n)^2*(phi2(1)*phi3(1)*xd(1,n)+phi3(1)*phi3(1)*xd(2,n)); 
@@ -175,7 +171,12 @@ while(n*t<=Te)
     xd(4,n+1)=xd(4,n)+dx4d(n)*t;
     n=n+1;
 end
-% plot(i,D)
+% i=t:t:Te+t;
+% plot(i,xd(1,:))
+% hold on;
+plot(i,D(1,:));
+hold on;
+plot(i,xd(2,:))
 
 
 %-------------------joint-based inversion control--------------------------

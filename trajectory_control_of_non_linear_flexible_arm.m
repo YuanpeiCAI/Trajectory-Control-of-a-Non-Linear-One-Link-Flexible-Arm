@@ -65,7 +65,7 @@ while(n*t<=Te)
     end
     n=n+1;
 end
-plot(i,dyd)
+plot(i,ddyd)
 
 
 
@@ -75,7 +75,7 @@ plot(i,dyd)
 % omega(2) and omega(3) represents the frequency
 M=ML/(rho*A*l);
 J=Jp/(rho*A*l^3);
-% beta=fsolve(@nxxf,3)
+% beta=fsolve(@nxxf,1)
 % f=sqrt(beta^4*EI/(rho*A*l^4))/(2*pi)
 beta(2)=1.6099;
 beta(3)=3.2114;
@@ -155,8 +155,10 @@ xd(4,1)=0;
 n=1;
 while(n*t<=Te)
     % nonlinear term
-    n2(1,1)=-ML*dyd(n)^2*(phi2(1)*phi2(1)*xd(1,n)+phi2(1)*phi3(1)*xd(2,n));
-    n2(2,1)=-ML*dyd(n)^2*(phi2(1)*phi3(1)*xd(1,n)+phi3(1)*phi3(1)*xd(2,n)); 
+    n2(1,1)=-ML*dyd(n)^2*(phi2(1)*phi2(1)*xd(1,n)+phi2(1)*phi3(1)*xd(2,n))...
+        -rho*A*l*dyd(n)^2*(quadl(@chi22,0,1)*xd(1,n)+quadl(@chi23,0,1)*xd(2,n));
+    n2(2,1)=-ML*dyd(n)^2*(phi2(1)*phi3(1)*xd(1,n)+phi3(1)*phi3(1)*xd(2,n))...
+        -rho*A*l*dyd(n)^2*(quadl(@chi23,0,1)*xd(1,n)+quadl(@chi33,0,1)*xd(2,n)); 
     %D is acceleration
     D(:,n)=[M(2,2) M(2,3); M(3,2) M(3,3)]^-1*([0; 0]-[K(1,1)*xd(1,n); K(2,2)*xd(2,n)]...
         -[F(1,1)*xd(3,n); F(2,1)*xd(4,n)]-[n2(1,1); n2(2,1)]-[M(2,1)*ddyd(n); M(3,1)*ddyd(n)]);
@@ -176,7 +178,7 @@ end
 % hold on;
 plot(i,D(1,:));
 hold on;
-plot(i,xd(2,:))
+% plot(i,xd(2,:))
 
 
 %-------------------joint-based inversion control--------------------------
